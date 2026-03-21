@@ -9,7 +9,6 @@ class UsuarioPersonalizado(AbstractUser):
 
     ROL_CHOICES = [
         ('usuario', 'Usuario'),
-        ('guia', 'Guía'),
         ('admin', 'Administrador'),
     ]
 
@@ -45,14 +44,9 @@ class UsuarioPersonalizado(AbstractUser):
     def __str__(self):
         return f"{self.username} ({self.get_rol_display()})"
 
-    # ── Helpers de rol ───────────────────────────────────────────────
     @property
     def es_admin(self):
         return self.rol == 'admin' or self.is_staff or self.is_superuser
-
-    @property
-    def es_guia(self):
-        return self.rol == 'guia'
 
     @property
     def es_usuario(self):

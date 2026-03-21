@@ -3,24 +3,17 @@ Django settings for Proyecto project.
 """
 
 from pathlib import Path
-from datetime import timedelta
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
-# SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-p6s+8)9om5cg2bq@1m6sd&&y53789o!3^lxk&dvoq&o958vpvp'
 
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
-# Indica que el modelo de usuario está en la app 'users'
 AUTH_USER_MODEL = 'users.UsuarioPersonalizado'
 
-# Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -28,20 +21,18 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',                        # ← NUEVO
     'users',
     'core',
-    'community',
+    'community.apps.CommunityConfig',
     'routes',
     'games',
     'ranking',
     'rest_framework',
-    'corsheaders',
-    'rest_framework_simplejwt',
-    'rest_framework_simplejwt.token_blacklist',
 ]
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',          # ← PRIMERO de todo
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -50,6 +41,14 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+# ===== CORS =====
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "http://192.168.1.2:3000",
+]
+CORS_ALLOW_CREDENTIALS = True
 
 ROOT_URLCONF = 'Proyecto.urls'
 
@@ -70,8 +69,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'Proyecto.wsgi.application'
 
-
-# Database
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -86,12 +83,8 @@ DATABASES = {
     }
 }
 
-
-# ===== Modelo de usuario personalizado =====
 AUTH_USER_MODEL = 'users.UsuarioPersonalizado'
 
-
-# ===== Configuración de correo electrónico =====
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
@@ -100,8 +93,6 @@ EMAIL_HOST_USER = 'caminapopayan@gmail.com'
 EMAIL_HOST_PASSWORD = 'cjlf jhym mhdy gpvy'
 DEFAULT_FROM_EMAIL = 'Camina Popayán <caminapopayan@gmail.com>'
 
-
-# Password validation
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
@@ -109,45 +100,17 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
-
-# Internationalization
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'America/Bogota'
 USE_I18N = True
 USE_TZ = True
 
-
-# Static files
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [
     BASE_DIR / 'users' / 'static',
 ]
 
-# Media files
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 LOGIN_URL = 'users:login'
-
-
-# ===== CORS =====
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-]
-
-
-# ===== REST FRAMEWORK =====
-REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-    ),
-}
-
-
-# ===== JWT =====
-SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(hours=1),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
-    'BLACKLIST_AFTER_ROTATION': True,
-    'ROTATE_REFRESH_TOKENS': True,
-}
