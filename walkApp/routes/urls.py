@@ -34,7 +34,6 @@ urlpatterns = [
     path('api/rutas/<int:ruta_id>/', api_views.api_detalle_ruta, name='api_detalle_ruta'),
     path('api/rutas/<int:ruta_id>/eliminar/', api_views.api_eliminar_ruta, name='api_eliminar_ruta'),
     path('api/rutas/<int:ruta_id>/favorita/', api_views.api_marcar_favorita, name='api_marcar_favorita'),
-    path('api/rutas/<int:ruta_id>/comentarios/', api_views.api_comentarios_ruta, name='api_comentarios_ruta'),
 
     # Viewsets
     path('', include(router.urls)),

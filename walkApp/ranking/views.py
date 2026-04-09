@@ -26,7 +26,7 @@ def mostrarRanking(request):
             user_profile, created = UserProfile.objects.get_or_create(
                 user=request.user,
                 defaults={
-                    'total_puntos': 0, 'Puntos_mensuales': 0,
+                    'total_puntos': 0, 'puntos_mensuales': 0,
                     'puntos_semanales': 0, 'distancia_total_km': 0, 'dias_activos': 0
                 }
             )
@@ -99,7 +99,7 @@ def api_estadisticas_usuario(request):
     user_profile, _ = UserProfile.objects.get_or_create(
         user=request.user,
         defaults={
-            'total_puntos': 0, 'Puntos_mensuales': 0,
+            'total_puntos': 0, 'puntos_mensuales': 0,
             'puntos_semanales': 0, 'distancia_total_km': 0, 'dias_activos': 0
         }
     )
