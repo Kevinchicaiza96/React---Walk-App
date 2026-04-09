@@ -18,3 +18,4 @@ staticfiles/
 # Sistema
 .DS_Store
 Thumbs.db
+node_modules
