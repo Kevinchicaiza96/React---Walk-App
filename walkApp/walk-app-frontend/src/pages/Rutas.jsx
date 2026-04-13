@@ -5,7 +5,7 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import "./Rutas.css";
 
-const ORS_API_KEY = "eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6IjI3NDQ2OTVkYmM3MzQ3OThiMzY4MmI1YjM1ZjEyNjM1IiwiaCI6Im11cm11cjY0In0=";
+const ORS_API_KEY = process.env.REACT_APP_ORS_API_KEY;
 
 const DIFICULTAD_COLORS = {
   FACIL:    { bg: "#e8f5e9", text: "#2d5a27", border: "#a5d6a7", dot: "#4caf50" },

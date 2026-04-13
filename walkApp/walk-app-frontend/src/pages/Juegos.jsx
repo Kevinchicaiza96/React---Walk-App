@@ -10,7 +10,7 @@ const BASE_STATIC = "http://127.0.0.1:8000/static/mapa_roto/images/imagenes_nive
 const MAPAS = {
   facil:   { grid: 3, piezaSize: 110, mapas: ["coconuco_sanNicolas.png", "Pilimbala_CraterPurace.png", "Popayan_TresCruces.png"] },
   normal:  { grid: 4, piezaSize: 90,  mapas: ["Popayan_TermalesCoconuco.png", "Popayán-Purace.png"] },
-  dificil: { grid: 5, piezaSize: 70,  mapas: [] },
+  dificil: { grid: 5, piezaSize: 70,  mapas: ["Pilimbala_CraterPurace.jpg"] },
 };
 
 const PREGUNTAS = {

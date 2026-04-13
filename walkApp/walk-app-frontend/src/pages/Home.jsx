@@ -136,7 +136,7 @@ export default function WalkApp() {
                 {[
                   { icon: "🗺️", title: "Rutas Verificadas",      desc: "Descubre senderos detallados con información precisa." },
                   { icon: "👥", title: "Comunidad Activa",        desc: "Conecta con caminantes, comparte experiencias y únete a grupos." },
-                  { icon: "🏆", title: "Desafíos y Recompensas",  desc: "Participa en retos y sube en el ranking." },
+                  { icon: "🎮", title: "Juegos y Ranking", desc: "Trivia senderista, rompecabezas de rutas y tabla de posiciones." },
                   { icon: "📍", title: "GPS Preciso",             desc: "Navegación offline para rutas sin señal." },
                 ].map((feat, i) => (
                   <AnimatedSection key={feat.title} delay={i * 0.1}>

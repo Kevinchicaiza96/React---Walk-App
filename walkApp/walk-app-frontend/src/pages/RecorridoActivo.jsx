@@ -29,7 +29,7 @@ export default function RecorridoActivo() {
   const navigate = useNavigate();
 
   const [ruta, setRuta] = useState(null);
-  const [fase, setFase] = useState("listo"); // listo | activo | finalizado
+  const [fase, setFase] = useState("listo");
   const [distancia, setDistancia] = useState(0);
   const [tiempo, setTiempo] = useState(0);
   const [, setPosActual] = useState(null);
@@ -45,12 +45,10 @@ export default function RecorridoActivo() {
   const posAnteriorRef = useRef(null);
   const distanciaRef = useRef(0);
 
-  // Cargar datos de la ruta
   useEffect(() => {
     api.get(`/api/rutas/${id}/`).then((res) => setRuta(res.data)).catch(() => navigate("/rutas"));
   }, [id, navigate]);
 
-  // Inicializar mapa Leaflet
   useEffect(() => {
     if (!ruta || mapInstance.current) return;
 
@@ -79,12 +77,10 @@ export default function RecorridoActivo() {
         maxZoom: 19,
       }).addTo(map);
 
-      // Dibujar ruta si tiene coordenadas
       if (ruta.coordenadas_ruta?.length > 1) {
         L.polyline(ruta.coordenadas_ruta, { color: "#2d5a27", weight: 4, opacity: 0.6, dashArray: "8,6" }).addTo(map);
       }
 
-      // Marcador de posición del usuario
       const iconoUsuario = L.divIcon({
         html: `<div style="width:20px;height:20px;background:#2d5a27;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 3px rgba(45,90,39,0.4)"></div>`,
         className: "",
@@ -112,10 +108,8 @@ export default function RecorridoActivo() {
     distanciaRef.current = 0;
     posAnteriorRef.current = null;
 
-    // Timer
     timerRef.current = setInterval(() => setTiempo((t) => t + 1), 1000);
 
-    // GPS watch
     watchIdRef.current = navigator.geolocation.watchPosition(
       (pos) => {
         const { latitude, longitude } = pos.coords;
@@ -124,14 +118,13 @@ export default function RecorridoActivo() {
         if (posAnteriorRef.current) {
           const [lat1, lon1] = posAnteriorRef.current;
           const d = calcularDistancia(lat1, lon1, latitude, longitude);
-          if (d > 0.003) { // filtro de ruido: solo sumar si movió más de 3m
+          if (d > 0.003) {
             distanciaRef.current += d;
             setDistancia(distanciaRef.current);
           }
         }
         posAnteriorRef.current = [latitude, longitude];
 
-        // Mover marcador en el mapa
         if (marcadorRef.current && mapInstance.current) {
           marcadorRef.current.setLatLng([latitude, longitude]);
           mapInstance.current.panTo([latitude, longitude]);
@@ -168,12 +161,16 @@ export default function RecorridoActivo() {
 
   const velocidadPromedio = tiempo > 0 ? (distancia / (tiempo / 3600)).toFixed(1) : "0.0";
 
-  if (!ruta) return <div className="recorrido-loading"><div className="recorrido-spinner" /><p>Cargando ruta...</p></div>;
+  if (!ruta) return (
+    <div className="recorrido-loading">
+      <div className="recorrido-spinner" />
+      <p>Cargando ruta...</p>
+    </div>
+  );
 
   return (
     <div className="recorrido-page">
 
-      {/* Header */}
       <div className="recorrido-header">
         <button className="recorrido-back" onClick={() => navigate(`/rutas/${id}`)}>← Volver</button>
         <div className="recorrido-header-info">
@@ -184,10 +181,8 @@ export default function RecorridoActivo() {
         </div>
       </div>
 
-      {/* Mapa */}
       <div ref={mapRef} className="recorrido-mapa" />
 
-      {/* Métricas */}
       <div className="recorrido-metricas">
         <div className="metrica-card">
           <div className="metrica-valor">{distancia.toFixed(2)}</div>
@@ -205,7 +200,6 @@ export default function RecorridoActivo() {
 
       {errorGPS && <div className="recorrido-error">{errorGPS}</div>}
 
-      {/* Controles */}
       <div className="recorrido-controles">
         {fase === "listo" && (
           <button className="btn-iniciar" onClick={iniciarRecorrido}>
@@ -224,14 +218,31 @@ export default function RecorridoActivo() {
         )}
       </div>
 
-      {/* Resumen final */}
       {resumen && (
         <div className="recorrido-resumen">
           <div className="resumen-titulo">🎉 ¡Recorrido completado!</div>
           <div className="resumen-grid">
-            <div className="resumen-item"><span className="resumen-icon">📍</span><div><div className="resumen-val">{distancia.toFixed(2)} km</div><div className="resumen-lbl">Distancia</div></div></div>
-            <div className="resumen-item"><span className="resumen-icon">⏱</span><div><div className="resumen-val">{formatTiempo(tiempo)}</div><div className="resumen-lbl">Tiempo</div></div></div>
-            <div className="resumen-item"><span className="resumen-icon">⭐</span><div><div className="resumen-val">{resumen.recorrido?.puntos_ganados || 0} pts</div><div class="resumen-lbl">Puntos ganados</div></div></div>
+            <div className="resumen-item">
+              <span className="resumen-icon">📍</span>
+              <div>
+                <div className="resumen-val">{distancia.toFixed(2)} km</div>
+                <div className="resumen-lbl">Distancia</div>
+              </div>
+            </div>
+            <div className="resumen-item">
+              <span className="resumen-icon">⏱</span>
+              <div>
+                <div className="resumen-val">{formatTiempo(tiempo)}</div>
+                <div className="resumen-lbl">Tiempo</div>
+              </div>
+            </div>
+            <div className="resumen-item">
+              <span className="resumen-icon">⭐</span>
+              <div>
+                <div className="resumen-val">{resumen.recorrido?.puntos_ganados || 0} pts</div>
+                <div className="resumen-lbl">Puntos ganados</div>
+              </div>
+            </div>
           </div>
           <button className="btn-volver" onClick={() => navigate(`/rutas/${id}`)}>← Volver a la ruta</button>
           <button className="btn-perfil" onClick={() => navigate("/perfil")}>Ver mi perfil</button>

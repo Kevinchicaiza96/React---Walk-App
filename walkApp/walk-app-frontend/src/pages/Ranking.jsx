@@ -194,6 +194,26 @@ export default function Ranking() {
   );
   const top3 = ranking.slice(0, 3);
 
+  // Helper para construir el podio con 1, 2 o 3 elementos
+  const buildPodio = (lista) => {
+    if (!lista || lista.length === 0) return [];
+    const top = lista.slice(0, 3);
+    if (top.length === 1) return [{ item: top[0], posVisual: 1 }];
+    if (top.length === 2) return [
+      { item: top[1], posVisual: 2 },
+      { item: top[0], posVisual: 1 },
+    ];
+    return [
+      { item: top[1], posVisual: 2 },
+      { item: top[0], posVisual: 1 },
+      { item: top[2], posVisual: 3 },
+    ];
+  };
+
+  const PODIO_SIZES =      { 1: 70,       2: 56,       3: 48 };
+  const PODIO_FONTSIZES =  { 1: "1.8rem", 2: "1.4rem", 3: "1.2rem" };
+  const PODIO_DELAYS =     { 1: "0s",     2: "0.1s",   3: "0.2s" };
+
   return (
     <div className="ranking-page">
       <Navbar />
@@ -223,56 +243,40 @@ export default function Ranking() {
             )}
           </div>
 
+          {/* Podio caminantes */}
           {!cargando && !error && top3.length > 0 && tab !== "juegos" && (
             <div className="podio-wrap">
-              {top3[1] && (
-                <div className="podio-item" style={{ animation: "podiumRise 0.6s ease 0.1s both" }}>
-                  <AvatarIcon username={top3[1].username} size={56} fontSize="1.4rem" pos={2} />
-                  <div className="podio-username podio-username-2">{top3[1].username}</div>
-                  <div className="podio-puntos-2">{top3[1].puntos_semanales?.toLocaleString()} pts</div>
-                  <div className="podio-base podio-base-2">🥈</div>
+              {buildPodio(top3).map(({ item, posVisual }) => (
+                <div key={item.username} className="podio-item"
+                  style={{ animation: `podiumRise 0.6s ease ${PODIO_DELAYS[posVisual]} both` }}>
+                  <AvatarIcon username={item.username} size={PODIO_SIZES[posVisual]} fontSize={PODIO_FONTSIZES[posVisual]} pos={posVisual} />
+                  <div className={`podio-username podio-username-${posVisual}`}>{item.username}</div>
+                  <div className={`podio-puntos-${posVisual}`}>{item.puntos_semanales?.toLocaleString()} pts</div>
+                  <div className={`podio-base podio-base-${posVisual}`}>{MEDALLAS[posVisual - 1]}</div>
                 </div>
-              )}
-              {top3[0] && (
-                <div className="podio-item" style={{ animation: "podiumRise 0.6s ease both" }}>
-                  <AvatarIcon username={top3[0].username} size={70} fontSize="1.8rem" pos={1} />
-                  <div className="podio-username podio-username-1">{top3[0].username}</div>
-                  <div className="podio-puntos-1">{top3[0].puntos_semanales?.toLocaleString()} pts</div>
-                  <div className="podio-base podio-base-1">🥇</div>
-                </div>
-              )}
-              {top3[2] && (
-                <div className="podio-item" style={{ animation: "podiumRise 0.6s ease 0.2s both" }}>
-                  <AvatarIcon username={top3[2].username} size={48} fontSize="1.2rem" pos={3} />
-                  <div className="podio-username podio-username-3">{top3[2].username}</div>
-                  <div className="podio-puntos-3">{top3[2].puntos_semanales?.toLocaleString()} pts</div>
-                  <div className="podio-base podio-base-3">🥉</div>
-                </div>
-              )}
+              ))}
             </div>
           )}
 
           {/* Podio juegos */}
-          {tab === "juegos" && rankingJuegos && (
-            <div className="podio-wrap" style={{ animation: "fadeUp 0.4s ease" }}>
-              {(tabJuego === "trivia" ? rankingJuegos.trivia : rankingJuegos.mapa_roto).slice(0, 3).map((entry, i) => {
-                const sizes = [70, 56, 48];
-                const fontSizes = ["1.8rem", "1.4rem", "1.2rem"];
-                const order = [1, 0, 2];
-                const e = (tabJuego === "trivia" ? rankingJuegos.trivia : rankingJuegos.mapa_roto).slice(0, 3);
-                const item = e[order[i]];
-                if (!item) return null;
-                return (
-                  <div key={item.username} className="podio-item" style={{ animation: `podiumRise 0.6s ease ${i * 0.1}s both` }}>
-                    <AvatarIcon username={item.username} size={sizes[i]} fontSize={fontSizes[i]} pos={item.posicion} />
-                    <div className={`podio-username podio-username-${item.posicion}`}>{item.username}</div>
-                    <div className={`podio-puntos-${item.posicion}`}>{item.total_puntos?.toLocaleString()} pts</div>
-                    <div className={`podio-base podio-base-${item.posicion}`}>{MEDALLAS[item.posicion - 1]}</div>
+          {tab === "juegos" && rankingJuegos && (() => {
+            const lista = tabJuego === "trivia" ? rankingJuegos.trivia : rankingJuegos.mapa_roto;
+            const podio = buildPodio(lista);
+            if (podio.length === 0) return null;
+            return (
+              <div className="podio-wrap" style={{ animation: "fadeUp 0.4s ease" }}>
+                {podio.map(({ item, posVisual }) => (
+                  <div key={item.username} className="podio-item"
+                    style={{ animation: `podiumRise 0.6s ease ${PODIO_DELAYS[posVisual]} both` }}>
+                    <AvatarIcon username={item.username} size={PODIO_SIZES[posVisual]} fontSize={PODIO_FONTSIZES[posVisual]} pos={posVisual} />
+                    <div className={`podio-username podio-username-${posVisual}`}>{item.username}</div>
+                    <div className={`podio-puntos-${posVisual}`}>{item.total_puntos?.toLocaleString()} pts</div>
+                    <div className={`podio-base podio-base-${posVisual}`}>{MEDALLAS[posVisual - 1]}</div>
                   </div>
-                );
-              })}
-            </div>
-          )}
+                ))}
+              </div>
+            );
+          })()}
 
           <div className="ranking-tabs">
             {[
@@ -290,7 +294,6 @@ export default function Ranking() {
 
       <div className="content-inner">
         <div className="ranking-layout">
-
           <div>
             {/* Tab Juegos */}
             {tab === "juegos" && (
@@ -382,7 +385,7 @@ export default function Ranking() {
 
                     {rankingFiltrado.map((entry, i) => {
                       const esYo = user && entry.username === user.username;
-                      const puntos = entry.puntos_semanales;
+                      const puntos = tab === "total" ? entry.total_puntos : entry.puntos_semanales;
                       return (
                         <div
                           key={entry.username}

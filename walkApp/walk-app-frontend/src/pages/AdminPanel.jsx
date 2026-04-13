@@ -322,7 +322,6 @@ function SeccionRutas() {
   );
 }
 
-/* ── NUEVA SECCIÓN SOS ── */
 function SeccionSOS() {
   const [alertas, setAlertas] = useState([]);
   const [cargando, setCargando] = useState(true);
@@ -335,7 +334,7 @@ function SeccionSOS() {
   const fetchAlertas = useCallback(async () => {
     setCargando(true);
     try {
-      const r = await api.get("/api/auth/sos/listar/");
+      const r = await api.get("/api/admin/sos/");
       setAlertas(r.data.alertas || []);
     } catch {} finally { setCargando(false); }
   }, []);
@@ -345,7 +344,7 @@ function SeccionSOS() {
   const handleCambiarEstado = async (id, nuevoEstado) => {
     setCambiando(id);
     try {
-      await api.patch(`/api/auth/sos/${id}/`, { estado: nuevoEstado });
+      await api.patch(`/api/admin/sos/${id}/atender/`, { estado: nuevoEstado });
       setAlertas(prev => prev.map(a => a.id === id ? { ...a, estado: nuevoEstado } : a));
       showToast(`Alerta marcada como ${nuevoEstado}`);
     } catch { showToast("Error al actualizar alerta", false); }
@@ -451,20 +450,28 @@ function SeccionSOS() {
 }
 
 const SECCIONES = [
-  { key: "dashboard", label: "Dashboard", emoji: "📊" },
-  { key: "usuarios",  label: "Usuarios",  emoji: "👥" },
-  { key: "rutas",     label: "Rutas",     emoji: "🏔️" },
-  { key: "sos",       label: "Alertas SOS", emoji: "🆘" },
+  { key: "dashboard", label: "Dashboard",   emoji: "📊" },
+  { key: "usuarios",  label: "Usuarios",    emoji: "👥" },
+  { key: "rutas",     label: "Rutas",       emoji: "🏔️" },
+  { key: "sos",       label: "SOS",         emoji: "🆘" },
 ];
 
 export default function AdminPanel() {
   const user = useAdminGuard();
   const [seccion, setSeccion] = useState("dashboard");
+  const [sosPendientes, setSosPendientes] = useState(0);
+
+  useEffect(() => {
+    api.get("/api/admin/sos/")
+      .then(r => setSosPendientes((r.data.alertas || []).filter(a => a.estado === "PENDIENTE").length))
+      .catch(() => {});
+  }, []);
 
   if (!user) return null;
 
   return (
     <div className="admin-page">
+      {/* Sidebar — visible solo en desktop */}
       <div className="admin-sidebar">
         <div className="admin-sidebar-header">
           <Link to="/" className="admin-sidebar-logo">
@@ -495,12 +502,30 @@ export default function AdminPanel() {
         </div>
       </div>
 
+      {/* Contenido principal */}
       <div className="admin-contenido">
         {seccion === "dashboard" && <SeccionDashboard />}
         {seccion === "usuarios"  && <SeccionUsuarios />}
         {seccion === "rutas"     && <SeccionRutas />}
         {seccion === "sos"       && <SeccionSOS />}
       </div>
+
+      {/* Barra inferior — visible solo en móvil */}
+      <nav className="bottom-nav">
+        {SECCIONES.map(s => (
+          <button
+            key={s.key}
+            className={`bottom-nav-item ${seccion === s.key ? "active" : ""}`}
+            onClick={() => setSeccion(s.key)}
+          >
+            <span className="bottom-nav-icon">{s.emoji}</span>
+            <span className="bottom-nav-label">{s.label}</span>
+            {s.key === "sos" && sosPendientes > 0 && (
+              <span className="bottom-nav-sos-dot" />
+            )}
+          </button>
+        ))}
+      </nav>
     </div>
   );
 }
